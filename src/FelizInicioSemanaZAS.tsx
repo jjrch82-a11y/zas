@@ -1,12 +1,16 @@
 import React from 'react';
 import {
 	AbsoluteFill,
+	Loop,
+	OffthreadVideo,
 	Sequence,
 	interpolate,
 	spring,
+	staticFile,
 	useCurrentFrame,
 	useVideoConfig,
 } from 'remotion';
+import {BoltIcon, ZasLogoLockup} from './Logo';
 
 // ============================================================================
 // CONFIGURACIÓN EDITABLE — cambia esto cada semana, no toques el resto.
@@ -17,12 +21,17 @@ export const DURATION_IN_FRAMES = 450; // 15s a 30fps
 export const VIDEO_WIDTH = 1080;
 export const VIDEO_HEIGHT = 1920;
 
-// Colores de marca ZAS (amarillo/negro estilo mototaxi).
+// Video de fondo (colócalo en public/ y actualiza el nombre aquí para cambiarlo).
+export const BACKGROUND_VIDEO_SRC = 'zas-mototaxi.mp4';
+export const BACKGROUND_VIDEO_DURATION_IN_FRAMES = 421; // duración real del clip, para loopear sin cortes
+
+// Colores de marca ZAS (amarillo/negro estilo mototaxi, con acento navy del logo).
 export const COLORS = {
 	brandYellow: '#FFC400',
 	brandYellowDark: '#E6A800',
 	brandBlack: '#0A0A0A',
 	brandBlackSoft: '#1A1A1A',
+	brandNavy: '#12172A',
 	white: '#FFFFFF',
 	shadow: 'rgba(0, 0, 0, 0.35)',
 };
@@ -31,8 +40,8 @@ export const COLORS = {
 export const TEXTS = {
 	logoTitle: 'ZAS',
 	logoSubtitle: 'MOTOTAXI',
-	mainTitle: '¡Feliz Inicio de Semana! 🏍️',
-	secondaryTitle: 'Empieza tu semana rápido y seguro con ZAS Mototaxi',
+	mainTitle: '¡Feliz Comienzo de Semana! 🏍️',
+	secondaryTitle: 'Empieza tu semana rápido y seguro. ¡Usa ZAS Mototaxi!',
 	ctaTitle: 'Descarga ZAS ahora',
 	ctaBadge: 'Disponible en Google Play',
 	website: 'zasapps.com',
@@ -91,7 +100,6 @@ export const FelizInicioSemanaZAS: React.FC = () => {
 
 const Background: React.FC = () => {
 	const frame = useCurrentFrame();
-	const {durationInFrames} = useVideoConfig();
 
 	// Fade-in del fondo en los primeros frames.
 	const opacity = interpolate(frame, [0, 20], [0, 1], {
@@ -99,16 +107,26 @@ const Background: React.FC = () => {
 		extrapolateRight: 'clamp',
 	});
 
-	// Movimiento lento del gradiente para que el fondo se sienta vivo.
-	const angle = interpolate(frame, [0, durationInFrames], [135, 165]);
-
 	return (
-		<AbsoluteFill
-			style={{
-				opacity,
-				background: `linear-gradient(${angle}deg, ${COLORS.brandYellow} 0%, ${COLORS.brandYellowDark} 45%, ${COLORS.brandBlack} 100%)`,
-			}}
-		/>
+		<AbsoluteFill style={{opacity}}>
+			<Loop durationInFrames={BACKGROUND_VIDEO_DURATION_IN_FRAMES}>
+				<OffthreadVideo
+					src={staticFile(BACKGROUND_VIDEO_SRC)}
+					muted
+					style={{
+						width: '100%',
+						height: '100%',
+						objectFit: 'cover',
+					}}
+				/>
+			</Loop>
+			{/* Velo oscuro para que el texto y el logo resalten sobre el video. */}
+			<AbsoluteFill
+				style={{
+					background: `linear-gradient(180deg, ${COLORS.brandNavy}CC 0%, ${COLORS.brandNavy}55 22%, ${COLORS.brandNavy}55 70%, ${COLORS.brandNavy}E6 100%)`,
+				}}
+			/>
+		</AbsoluteFill>
 	);
 };
 
@@ -143,31 +161,8 @@ const IntroLogo: React.FC = () => {
 				opacity: opacity * fadeOut,
 			}}
 		>
-			<div style={{transform: `scale(${scale})`, textAlign: 'center'}}>
-				<div
-					style={{
-						fontFamily: 'Arial, sans-serif',
-						fontWeight: 900,
-						fontSize: 220,
-						color: COLORS.brandBlack,
-						letterSpacing: 8,
-						textShadow: `0 10px 30px ${COLORS.shadow}`,
-					}}
-				>
-					{TEXTS.logoTitle}
-				</div>
-				<div
-					style={{
-						fontFamily: 'Arial, sans-serif',
-						fontWeight: 700,
-						fontSize: 48,
-						color: COLORS.brandBlack,
-						letterSpacing: 20,
-						marginTop: 10,
-					}}
-				>
-					{TEXTS.logoSubtitle}
-				</div>
+			<div style={{transform: `scale(${scale})`}}>
+				<ZasLogoLockup iconSize={190} wordmarkSize={140} taglineSize={36} />
 			</div>
 		</AbsoluteFill>
 	);
@@ -200,18 +195,27 @@ const PersistentLogo: React.FC = () => {
 					marginTop: 90,
 					opacity,
 					transform: `translateY(${translateY}px)`,
-					fontFamily: 'Arial, sans-serif',
-					fontWeight: 900,
-					fontSize: 56,
-					color: COLORS.brandBlack,
-					letterSpacing: 4,
-					backgroundColor: COLORS.brandYellow,
-					padding: '10px 32px',
+					display: 'flex',
+					alignItems: 'center',
+					gap: 14,
+					backgroundColor: 'rgba(10, 10, 10, 0.55)',
+					padding: '14px 32px',
 					borderRadius: 999,
 					boxShadow: `0 8px 20px ${COLORS.shadow}`,
 				}}
 			>
-				{TEXTS.logoTitle}
+				<BoltIcon size={44} />
+				<span
+					style={{
+						fontFamily: 'Arial, sans-serif',
+						fontWeight: 900,
+						fontSize: 44,
+						color: COLORS.brandYellow,
+						letterSpacing: 3,
+					}}
+				>
+					{TEXTS.logoTitle}
+				</span>
 			</div>
 		</AbsoluteFill>
 	);
