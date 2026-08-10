@@ -22,7 +22,9 @@ export const VIDEO_WIDTH = 1080;
 export const VIDEO_HEIGHT = 1920;
 
 // Video de fondo (colócalo en public/ y actualiza el nombre aquí para cambiarlo).
-export const BACKGROUND_VIDEO_SRC = 'zas-mototaxi.mp4';
+// La versión "-hd" es el clip original reescalado a 1080x1920 con nitidez y
+// color mejorados (ver public/zas-mototaxi.mp4 para el original sin procesar).
+export const BACKGROUND_VIDEO_SRC = 'zas-mototaxi-hd.mp4';
 export const BACKGROUND_VIDEO_DURATION_IN_FRAMES = 421; // duración real del clip, para loopear sin cortes
 
 // Colores de marca ZAS (amarillo/negro estilo mototaxi, con acento navy del logo).
@@ -415,7 +417,7 @@ const CtaScene: React.FC = () => {
 
 // Badge genérico estilo "disponible en Google Play". No reproduce el logo
 // oficial de Google; sustitúyelo por el asset oficial si lo necesitas.
-const GooglePlayBadge: React.FC = () => {
+export const GooglePlayBadge: React.FC<{label?: string}> = ({label = TEXTS.ctaBadge}) => {
 	return (
 		<div
 			style={{
@@ -439,7 +441,7 @@ const GooglePlayBadge: React.FC = () => {
 				}}
 			/>
 			<span style={{fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: 34}}>
-				{TEXTS.ctaBadge}
+				{label}
 			</span>
 		</div>
 	);
