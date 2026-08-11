@@ -12,7 +12,7 @@ import {
 	useVideoConfig,
 } from 'remotion';
 import {DynamicBackground} from './DynamicBackground';
-import {ZasLogoLockup, BoltIcon} from './Logo';
+import {ZasLogoLockup, BoltIcon, MototaxiRiderIcon} from './Logo';
 import {COLORS} from './theme';
 
 export {COLORS};
@@ -22,7 +22,7 @@ export {COLORS};
 // ============================================================================
 
 export const FPS = 30;
-export const DURATION_IN_FRAMES = 450; // 15s a 30fps
+export const DURATION_IN_FRAMES = 600; // 20s a 30fps
 export const VIDEO_WIDTH = 1080;
 export const VIDEO_HEIGHT = 1920;
 
@@ -47,17 +47,25 @@ export const TEXTS = {
 	mainTitle: '¿Vas a salir? No pares en la esquina a esperar.',
 	secondaryText: 'Pide tu ZAS y llega seguro, a tu hora.',
 	trustText: 'Conductores verificados. Tu familia tranquila.',
-	ctaTitle: 'Descarga ZAS Mototaxi',
+	ctaTitle: 'Descarga ZAS en la Play Store',
+	ctaBadge: 'Disponible en Google Play',
 	website: 'zasapps.com',
+	socialTitle: 'Síguenos en nuestras redes',
+	social: [
+		{platform: 'Instagram', handle: '@zasapp_2026', color: '#E1306C'},
+		{platform: 'TikTok', handle: '@zasapp2026', color: '#25F4EE'},
+		{platform: 'Facebook', handle: '@zasapp', color: '#1877F2'},
+	],
 };
 
-// Timing de cada escena, en frames (30fps). 60+120+120+90+60 = 450 (15s).
+// Timing de cada escena, en frames (30fps). 60+120+120+90+90+120 = 600 (20s).
 export const SCENES = {
 	intro: {from: 0, durationInFrames: 60}, // 0-2s: fondo + logo
 	mainTitle: {from: 60, durationInFrames: 120}, // 2-6s: texto grande
 	secondary: {from: 180, durationInFrames: 120}, // 6-10s: quién viene y cuándo llega
 	trust: {from: 300, durationInFrames: 90}, // 10-13s: conductores verificados
-	cta: {from: 390, durationInFrames: 60}, // 13-15s: call to action
+	cta: {from: 390, durationInFrames: 90}, // 13-16s: call to action + Play Store
+	social: {from: 480, durationInFrames: 120}, // 16-20s: redes sociales
 };
 
 const CUT_FRAMES = [
@@ -66,6 +74,7 @@ const CUT_FRAMES = [
 	SCENES.secondary.from,
 	SCENES.trust.from,
 	SCENES.cta.from,
+	SCENES.social.from,
 ];
 
 // ============================================================================
@@ -111,6 +120,10 @@ export const FelizInicioSemanaZAS: React.FC = () => {
 
 			<Sequence from={SCENES.cta.from} durationInFrames={SCENES.cta.durationInFrames}>
 				<CtaScene />
+			</Sequence>
+
+			<Sequence from={SCENES.social.from} durationInFrames={SCENES.social.durationInFrames}>
+				<SocialScene />
 			</Sequence>
 		</AbsoluteFill>
 	);
@@ -433,19 +446,53 @@ const ShieldCheckIcon: React.FC<{size?: number}> = ({size = 150}) => (
 );
 
 // ============================================================================
-// ESCENA 5: CALL TO ACTION (13-15s)
+// ESCENA 5: CALL TO ACTION (13-16s) — mototaxista + Play Store.
 // ============================================================================
 
 const CtaScene: React.FC = () => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 
-	const titleEntrance = spring({frame, fps, config: {damping: 10, stiffness: 120, mass: 0.6}});
-	const titleOpacity = interpolate(titleEntrance, [0, 1], [0, 1]);
-	const titleScale = interpolate(titleEntrance, [0, 1], [0.5, 1]);
+	const riderEntrance = spring({frame, fps, config: {damping: 9, stiffness: 140, mass: 0.6}});
+	const riderOpacity = interpolate(riderEntrance, [0, 1], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const riderScale = interpolate(riderEntrance, [0, 1], [0.4, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+
+	const titleEntrance = spring({
+		frame: frame - 10,
+		fps,
+		config: {damping: 10, stiffness: 120, mass: 0.6},
+	});
+	const titleOpacity = interpolate(titleEntrance, [0, 1], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const titleScale = interpolate(titleEntrance, [0, 1], [0.5, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+
+	const badgeEntrance = spring({
+		frame: frame - 26,
+		fps,
+		config: {damping: 200, stiffness: 110, mass: 0.7},
+	});
+	const badgeOpacity = interpolate(badgeEntrance, [0, 1], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const badgeTranslateY = interpolate(badgeEntrance, [0, 1], [30, 0], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
 
 	const websiteEntrance = spring({
-		frame: frame - 15,
+		frame: frame - 38,
 		fps,
 		config: {damping: 200, stiffness: 110, mass: 0.7},
 	});
@@ -456,30 +503,39 @@ const CtaScene: React.FC = () => {
 
 	return (
 		<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+			<div style={{opacity: riderOpacity, transform: `scale(${riderScale})`, marginBottom: 18}}>
+				<MototaxiRiderIcon size={210} />
+			</div>
+
 			<div
 				style={{
 					opacity: titleOpacity,
 					transform: `scale(${titleScale})`,
 					fontFamily: 'Arial, sans-serif',
 					fontWeight: 900,
-					fontSize: 84,
+					fontSize: 72,
 					color: COLORS.white,
 					textAlign: 'center',
 					textShadow: `0 8px 24px ${COLORS.shadow}`,
-					padding: '0 60px',
+					padding: '0 70px',
+					marginBottom: 30,
 				}}
 			>
 				{TEXTS.ctaTitle}
 			</div>
 
+			<div style={{opacity: badgeOpacity, transform: `translateY(${badgeTranslateY}px)`}}>
+				<GooglePlayBadge label={TEXTS.ctaBadge} />
+			</div>
+
 			<div
 				style={{
 					position: 'absolute',
-					bottom: 120,
+					bottom: 90,
 					opacity: websiteOpacity,
 					fontFamily: 'Arial, sans-serif',
 					fontWeight: 700,
-					fontSize: 48,
+					fontSize: 44,
 					color: COLORS.white,
 					letterSpacing: 2,
 					textShadow: `0 4px 12px ${COLORS.shadow}`,
@@ -488,6 +544,130 @@ const CtaScene: React.FC = () => {
 				{TEXTS.website}
 			</div>
 		</AbsoluteFill>
+	);
+};
+
+// ============================================================================
+// ESCENA 6: REDES SOCIALES (16-20s)
+// ============================================================================
+
+const SocialScene: React.FC = () => {
+	const frame = useCurrentFrame();
+	const {fps} = useVideoConfig();
+	const sceneDuration = SCENES.social.durationInFrames;
+
+	const titleEntrance = spring({frame, fps, config: {damping: 200, stiffness: 120, mass: 0.7}});
+	const titleOpacity = interpolate(titleEntrance, [0, 1], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const titleTranslateY = interpolate(titleEntrance, [0, 1], [30, 0], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+
+	const fadeOut = interpolate(frame, [sceneDuration - 20, sceneDuration], [1, 0], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+
+	return (
+		<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+			<div
+				style={{
+					opacity: titleOpacity * fadeOut,
+					transform: `translateY(${titleTranslateY}px)`,
+					fontFamily: 'Arial, sans-serif',
+					fontWeight: 900,
+					fontSize: 62,
+					color: COLORS.white,
+					textAlign: 'center',
+					textShadow: `0 6px 18px ${COLORS.shadow}`,
+					marginBottom: 44,
+				}}
+			>
+				{TEXTS.socialTitle}
+			</div>
+			<div style={{opacity: fadeOut, display: 'flex', flexDirection: 'column', gap: 26}}>
+				{TEXTS.social.map((item, index) => (
+					<SocialRow
+						key={item.platform}
+						platform={item.platform}
+						handle={item.handle}
+						color={item.color}
+						delay={16 + index * 10}
+					/>
+				))}
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+const SocialRow: React.FC<{platform: string; handle: string; color: string; delay: number}> = ({
+	platform,
+	handle,
+	color,
+	delay,
+}) => {
+	const frame = useCurrentFrame();
+	const {fps} = useVideoConfig();
+
+	const entrance = spring({
+		frame: frame - delay,
+		fps,
+		config: {damping: 9, stiffness: 150, mass: 0.6},
+	});
+	const opacity = interpolate(entrance, [0, 1], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const scale = interpolate(entrance, [0, 1], [0.4, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+	const translateX = interpolate(entrance, [0, 1], [-110, 0], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+	});
+
+	return (
+		<div
+			style={{
+				opacity,
+				transform: `translateX(${translateX}px) scale(${scale})`,
+				display: 'flex',
+				alignItems: 'center',
+				gap: 22,
+				backgroundColor: 'rgba(10, 10, 10, 0.55)',
+				borderRadius: 20,
+				padding: '20px 48px',
+				boxShadow: `0 10px 30px ${COLORS.shadow}`,
+			}}
+		>
+			<div style={{width: 20, height: 20, borderRadius: '50%', backgroundColor: color}} />
+			<div style={{display: 'flex', flexDirection: 'column'}}>
+				<span
+					style={{
+						fontFamily: 'Arial, sans-serif',
+						fontWeight: 900,
+						fontSize: 40,
+						color: COLORS.white,
+					}}
+				>
+					{platform}
+				</span>
+				<span
+					style={{
+						fontFamily: 'Arial, sans-serif',
+						fontWeight: 700,
+						fontSize: 32,
+						color: COLORS.brandYellow,
+					}}
+				>
+					{handle}
+				</span>
+			</div>
+		</div>
 	);
 };
 
