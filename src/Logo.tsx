@@ -1,5 +1,5 @@
 import React from 'react';
-import {COLORS} from './FelizInicioSemanaZAS';
+import {COLORS} from './theme';
 
 // Recreación vectorial del logo ZAS (rayo con degradado amarillo → verde → azul,
 // wordmark "ZAS" y tagline). Si tienes el archivo de logo original, colócalo en

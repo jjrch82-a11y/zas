@@ -1,7 +1,9 @@
 import React from 'react';
 import {
 	AbsoluteFill,
+	Audio,
 	Img,
+	Loop,
 	Sequence,
 	interpolate,
 	spring,
@@ -9,7 +11,11 @@ import {
 	useCurrentFrame,
 	useVideoConfig,
 } from 'remotion';
+import {DynamicBackground} from './DynamicBackground';
 import {ZasLogoLockup, BoltIcon} from './Logo';
+import {COLORS} from './theme';
+
+export {COLORS};
 
 // ============================================================================
 // CONFIGURACIÓN EDITABLE — cambia esto cada semana, no toques el resto.
@@ -28,21 +34,18 @@ export const VIDEO_HEIGHT = 1920;
 export const LOGO_SRC = 'assets/zas-logo.png';
 export const LOGO_MODE: 'image' | 'vector' = 'vector';
 
-// Colores de marca ZAS (amarillo/negro estilo mototaxi).
-export const COLORS = {
-	brandYellow: '#FFC400',
-	brandYellowDark: '#E6A800',
-	brandBlack: '#0A0A0A',
-	brandBlackSoft: '#1A1A1A',
-	brandNavy: '#12172A',
-	white: '#FFFFFF',
-	shadow: 'rgba(0, 0, 0, 0.35)',
+// Audio: música de fondo (loopeada) + sonido de transición en cada corte de
+// escena. Ambos generados localmente (ver public/bg-music.mp3 y whoosh.mp3).
+export const AUDIO = {
+	music: 'bg-music.mp3',
+	musicLoopDurationInFrames: 300, // el clip dura 10s (300f a 30fps)
+	whoosh: 'whoosh.mp3',
 };
 
 // Textos de la plantilla. Edita libremente semana a semana.
 export const TEXTS = {
-	mainTitle: '¡Feliz Inicio de Semana! 🏍️',
-	secondaryText: 'Empieza tu semana sabiendo quién viene y cuándo llega',
+	mainTitle: '¿Vas a salir? No pares en la esquina a esperar.',
+	secondaryText: 'Pide tu ZAS y llega seguro, a tu hora.',
 	trustText: 'Conductores verificados. Tu familia tranquila.',
 	ctaTitle: 'Descarga ZAS Mototaxi',
 	website: 'zasapps.com',
@@ -57,6 +60,14 @@ export const SCENES = {
 	cta: {from: 390, durationInFrames: 60}, // 13-15s: call to action
 };
 
+const CUT_FRAMES = [
+	SCENES.intro.from,
+	SCENES.mainTitle.from,
+	SCENES.secondary.from,
+	SCENES.trust.from,
+	SCENES.cta.from,
+];
+
 // ============================================================================
 // COMPOSICIÓN PRINCIPAL
 // ============================================================================
@@ -64,8 +75,17 @@ export const SCENES = {
 export const FelizInicioSemanaZAS: React.FC = () => {
 	return (
 		<AbsoluteFill style={{backgroundColor: COLORS.brandBlack}}>
-			<Background />
+			<DynamicBackground cutFrames={CUT_FRAMES} />
 			<PersistentLogo />
+
+			<Loop durationInFrames={AUDIO.musicLoopDurationInFrames}>
+				<Audio src={staticFile(AUDIO.music)} volume={0.5} />
+			</Loop>
+			{CUT_FRAMES.map((cutFrame) => (
+				<Sequence key={cutFrame} from={cutFrame} durationInFrames={20}>
+					<Audio src={staticFile(AUDIO.whoosh)} volume={0.65} />
+				</Sequence>
+			))}
 
 			<Sequence from={SCENES.intro.from} durationInFrames={SCENES.intro.durationInFrames}>
 				<IntroLogo />
@@ -93,33 +113,6 @@ export const FelizInicioSemanaZAS: React.FC = () => {
 				<CtaScene />
 			</Sequence>
 		</AbsoluteFill>
-	);
-};
-
-// ============================================================================
-// FONDO — gradiente de marca ZAS (amarillo → negro), presente todo el video.
-// ============================================================================
-
-const Background: React.FC = () => {
-	const frame = useCurrentFrame();
-	const {durationInFrames} = useVideoConfig();
-
-	// Fade-in del fondo en los primeros frames.
-	const opacity = interpolate(frame, [0, 20], [0, 1], {
-		extrapolateLeft: 'clamp',
-		extrapolateRight: 'clamp',
-	});
-
-	// Movimiento lento del gradiente para que el fondo se sienta vivo.
-	const angle = interpolate(frame, [0, durationInFrames], [135, 165]);
-
-	return (
-		<AbsoluteFill
-			style={{
-				opacity,
-				background: `linear-gradient(${angle}deg, ${COLORS.brandYellow} 0%, ${COLORS.brandYellowDark} 45%, ${COLORS.brandBlack} 100%)`,
-			}}
-		/>
 	);
 };
 
@@ -284,8 +277,8 @@ const MainTitleScene: React.FC = () => {
 					transform: `scale(${scale})`,
 					fontFamily: 'Arial, sans-serif',
 					fontWeight: 900,
-					fontSize: 96,
-					lineHeight: 1.15,
+					fontSize: 80,
+					lineHeight: 1.2,
 					color: COLORS.white,
 					textAlign: 'center',
 					textShadow: `0 8px 24px ${COLORS.shadow}`,
