@@ -4,7 +4,7 @@ import {
 	CAROUSEL_HEIGHT,
 	CAROUSEL_WIDTH,
 	CarruselEducativoZAS,
-	SLIDES,
+	TOTAL_SLIDES,
 } from './CarruselEducativoZAS';
 import {
 	DURATION_IN_FRAMES,
@@ -34,7 +34,7 @@ export const RemotionRoot: React.FC = () => {
 				width={APP_WIDTH}
 				height={APP_HEIGHT}
 			/>
-			{SLIDES.map((_, slideIndex) => (
+			{Array.from({length: TOTAL_SLIDES}, (_, slideIndex) => (
 				<Still
 					key={slideIndex}
 					id={`CarruselEducativoZAS-${slideIndex + 1}`}

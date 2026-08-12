@@ -13,10 +13,19 @@ import {GooglePlayBadge} from './FelizInicioSemanaZAS';
 // array, para que nunca quede desincronizado.
 //
 // `screenshot` es el nombre del archivo dentro de public/screenshots/.
+//
+// La portada (COVER) es una slide extra de solo texto que siempre va primero
+// (Still -1) y no cuenta para el número "n/total" de los pasos — esos siguen
+// mostrando "1/5"..."5/5" como antes.
 // ============================================================================
 
 export const CAROUSEL_WIDTH = 1080;
 export const CAROUSEL_HEIGHT = 1350; // 4:5, formato carrusel de Instagram
+
+const COVER = {
+	titulo: 'Así de fácil es pedir tu ZAS',
+	subtitulo: 'Guía rápida en 5 pasos',
+};
 
 type Slide = {
 	titulo: string;
@@ -54,19 +63,27 @@ export const SLIDES: Slide[] = [
 
 // ============================================================================
 // COMPOSICIÓN — una instancia (Still) por slide. Recibe `slideIndex` como
-// prop para saber cuál elemento de SLIDES le toca renderizar.
+// prop: 0 es la portada, 1..SLIDES.length son los pasos (SLIDES[slideIndex - 1]).
 // ============================================================================
 
+// Total de Still que Root.tsx debe registrar: la portada + un paso por
+// elemento de SLIDES.
+export const TOTAL_SLIDES = SLIDES.length + 1;
+
 export const CarruselEducativoZAS: React.FC<{slideIndex: number}> = ({slideIndex}) => {
-	const slide = SLIDES[slideIndex];
+	if (slideIndex === 0) {
+		return <CoverSlide />;
+	}
+
+	const slide = SLIDES[slideIndex - 1];
 	if (!slide) {
 		throw new Error(
-			`CarruselEducativoZAS: no existe el slide ${slideIndex} (SLIDES tiene ${SLIDES.length} elementos)`
+			`CarruselEducativoZAS: no existe el slide ${slideIndex} (hay ${SLIDES.length} pasos + 1 portada)`
 		);
 	}
 
-	const numero = `${slideIndex + 1}/${SLIDES.length}`;
-	const isLastSlide = slideIndex === SLIDES.length - 1;
+	const numero = `${slideIndex}/${SLIDES.length}`;
+	const isLastSlide = slideIndex === SLIDES.length;
 
 	return (
 		<AbsoluteFill style={{backgroundColor: COLORS.brandBlack}}>
@@ -120,6 +137,91 @@ export const CarruselEducativoZAS: React.FC<{slideIndex: number}> = ({slideIndex
 		</AbsoluteFill>
 	);
 };
+
+// ============================================================================
+// PORTADA — slide 0, solo texto. Usa el degradado de marca a pantalla
+// completa (en vez de la franja delgada de las slides de pasos) para
+// destacar como gancho de scroll; no lleva número ni mockup de teléfono.
+// ============================================================================
+
+const CoverSlide: React.FC = () => (
+	<AbsoluteFill
+		style={{
+			background: `linear-gradient(165deg, #F7E24B 0%, #3FDC8C 32%, #2FC6D8 55%, #3B8CE8 72%, ${COLORS.brandBlack} 100%)`,
+		}}
+	>
+		<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', padding: '0 110px'}}>
+			<div style={{marginBottom: 34, filter: `drop-shadow(0 12px 24px ${COLORS.shadow})`}}>
+				<BoltIcon size={120} />
+			</div>
+			<div
+				style={{
+					fontFamily: 'Arial, sans-serif',
+					fontWeight: 700,
+					fontSize: 28,
+					color: COLORS.brandBlack,
+					letterSpacing: 5,
+					textTransform: 'uppercase',
+					marginBottom: 26,
+				}}
+			>
+				Guía rápida
+			</div>
+			<div
+				style={{
+					fontFamily: 'Arial, sans-serif',
+					fontWeight: 900,
+					fontSize: 94,
+					lineHeight: 1.1,
+					color: COLORS.white,
+					textAlign: 'center',
+					textShadow: `0 10px 26px ${COLORS.shadow}`,
+					marginBottom: 26,
+				}}
+			>
+				{COVER.titulo}
+			</div>
+			<div
+				style={{
+					fontFamily: 'Arial, sans-serif',
+					fontWeight: 600,
+					fontSize: 42,
+					color: COLORS.white,
+					textAlign: 'center',
+				}}
+			>
+				{COVER.subtitulo}
+			</div>
+		</AbsoluteFill>
+
+		<div
+			style={{
+				position: 'absolute',
+				bottom: 80,
+				left: 0,
+				right: 0,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				gap: 14,
+			}}
+		>
+			<span
+				style={{
+					fontFamily: 'Arial, sans-serif',
+					fontWeight: 700,
+					fontSize: 30,
+					color: COLORS.white,
+					letterSpacing: 1,
+					textShadow: `0 4px 12px ${COLORS.shadow}`,
+				}}
+			>
+				Desliza para ver los pasos
+			</span>
+			<span style={{fontSize: 32, color: COLORS.white, textShadow: `0 4px 12px ${COLORS.shadow}`}}>→</span>
+		</div>
+	</AbsoluteFill>
+);
 
 // ============================================================================
 // BARRA SUPERIOR — degradado de marca ZAS (mismos tonos que el rayo del
