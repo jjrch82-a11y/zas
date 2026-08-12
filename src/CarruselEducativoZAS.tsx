@@ -13,10 +13,6 @@ import {GooglePlayBadge} from './FelizInicioSemanaZAS';
 // array, para que nunca quede desincronizado.
 //
 // `screenshot` es el nombre del archivo dentro de public/screenshots/.
-//
-// TEXTOS PENDIENTES: titulo/descripcion son placeholders — reemplázalos con
-// el copy real de cada paso una vez que confirmes el contenido de las
-// capturas.
 // ============================================================================
 
 export const CAROUSEL_WIDTH = 1080;
@@ -30,28 +26,28 @@ type Slide = {
 
 export const SLIDES: Slide[] = [
 	{
-		titulo: '[Título del paso 1]',
-		descripcion: '[Descripción breve del paso 1]',
+		titulo: 'Inicia sesión en ZAS',
+		descripcion: 'Ingresa tu teléfono y contraseña para entrar a tu cuenta',
 		screenshot: 'paso-1.png',
 	},
 	{
-		titulo: '[Título del paso 2]',
-		descripcion: '[Descripción breve del paso 2]',
+		titulo: 'Marca tu origen',
+		descripcion: 'Mueve el mapa a tu ubicación o búscala directamente',
 		screenshot: 'paso-2.png',
 	},
 	{
-		titulo: '[Título del paso 3]',
-		descripcion: '[Descripción breve del paso 3]',
+		titulo: 'Elige tu destino',
+		descripcion: 'Confirma a dónde quieres llegar',
 		screenshot: 'paso-3.png',
 	},
 	{
-		titulo: '[Título del paso 4]',
-		descripcion: '[Descripción breve del paso 4]',
+		titulo: 'Revisa el precio y confirma',
+		descripcion: 'Ajusta tu oferta al conductor si quieres',
 		screenshot: 'paso-4.png',
 	},
 	{
-		titulo: '[Título del paso 5]',
-		descripcion: '[Descripción breve del paso 5]',
+		titulo: 'Elige tu forma de pago',
+		descripcion: 'Selecciona el método y solicita tu ZAS',
 		screenshot: 'paso-5.png',
 	},
 ];
