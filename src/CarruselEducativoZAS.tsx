@@ -28,27 +28,27 @@ export const SLIDES: Slide[] = [
 	{
 		titulo: 'Inicia sesión en ZAS',
 		descripcion: 'Ingresa tu teléfono y contraseña para entrar a tu cuenta',
-		screenshot: 'paso-1.png',
+		screenshot: 'paso-1.jpg',
 	},
 	{
 		titulo: 'Marca tu origen',
 		descripcion: 'Mueve el mapa a tu ubicación o búscala directamente',
-		screenshot: 'paso-2.png',
+		screenshot: 'paso-2.jpg',
 	},
 	{
 		titulo: 'Elige tu destino',
 		descripcion: 'Confirma a dónde quieres llegar',
-		screenshot: 'paso-3.png',
+		screenshot: 'paso-3.jpg',
 	},
 	{
 		titulo: 'Revisa el precio y confirma',
 		descripcion: 'Ajusta tu oferta al conductor si quieres',
-		screenshot: 'paso-4.png',
+		screenshot: 'paso-4.jpg',
 	},
 	{
 		titulo: 'Elige tu forma de pago',
 		descripcion: 'Selecciona el método y solicita tu ZAS',
-		screenshot: 'paso-5.png',
+		screenshot: 'paso-5.jpg',
 	},
 ];
 
