@@ -1,5 +1,11 @@
 import React from 'react';
-import {Composition} from 'remotion';
+import {Composition, Still} from 'remotion';
+import {
+	CAROUSEL_HEIGHT,
+	CAROUSEL_WIDTH,
+	CarruselEducativoZAS,
+	SLIDES,
+} from './CarruselEducativoZAS';
 import {
 	DURATION_IN_FRAMES,
 	FPS,
@@ -28,6 +34,16 @@ export const RemotionRoot: React.FC = () => {
 				width={APP_WIDTH}
 				height={APP_HEIGHT}
 			/>
+			{SLIDES.map((_, slideIndex) => (
+				<Still
+					key={slideIndex}
+					id={`CarruselEducativoZAS-${slideIndex + 1}`}
+					component={CarruselEducativoZAS}
+					width={CAROUSEL_WIDTH}
+					height={CAROUSEL_HEIGHT}
+					defaultProps={{slideIndex}}
+				/>
+			))}
 		</>
 	);
 };
