@@ -2,52 +2,57 @@ import React from 'react';
 import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {BoltIcon} from './Logo';
 import {COLORS} from './theme';
-import {GooglePlayBadge, LOGO_MODE, LOGO_SRC} from './FelizInicioSemanaZAS';
+import {GooglePlayBadge} from './FelizInicioSemanaZAS';
 
 // ============================================================================
 // CONFIGURACIÓN EDITABLE — agrega, quita o reordena elementos de SLIDES para
 // armar un nuevo carrusel. Cada slide se convierte automáticamente en una
 // composición Still independiente (CarruselEducativoZAS-1, -2, -3...) desde
 // Root.tsx, así que no hay que tocar nada más al cambiar el número de slides.
-// El número "1/3", "2/3"... se calcula solo a partir de la posición en el
+// El número "1/5", "2/5"... se calcula solo a partir de la posición en el
 // array, para que nunca quede desincronizado.
+//
+// `screenshot` es el nombre del archivo dentro de public/screenshots/.
+//
+// TEXTOS PENDIENTES: titulo/descripcion son placeholders — reemplázalos con
+// el copy real de cada paso una vez que confirmes el contenido de las
+// capturas.
 // ============================================================================
 
 export const CAROUSEL_WIDTH = 1080;
 export const CAROUSEL_HEIGHT = 1350; // 4:5, formato carrusel de Instagram
 
-// Íconos disponibles para las slides. Agrega más entradas aquí si necesitas
-// otro ícono; el campo `icono` de cada slide se autocompleta con estas claves.
-const ICONS = {
-	telefono: '📱',
-	conductor: '🏍️',
-	ubicacion: '📍',
-	escudo: '🛡️',
-	reloj: '⏱️',
-	familia: '👨‍👩‍👧',
-} as const;
-
 type Slide = {
 	titulo: string;
 	descripcion: string;
-	icono?: keyof typeof ICONS;
+	screenshot: string;
 };
 
 export const SLIDES: Slide[] = [
 	{
-		titulo: 'Abre la app ZAS',
-		descripcion: 'Ingresa tu destino y confirma tu ubicación',
-		icono: 'telefono',
+		titulo: '[Título del paso 1]',
+		descripcion: '[Descripción breve del paso 1]',
+		screenshot: 'paso-1.png',
 	},
 	{
-		titulo: 'Elige tu conductor',
-		descripcion: 'Ve quién viene, cuánto tarda y su verificación',
-		icono: 'conductor',
+		titulo: '[Título del paso 2]',
+		descripcion: '[Descripción breve del paso 2]',
+		screenshot: 'paso-2.png',
 	},
 	{
-		titulo: 'Listo, ya vas en camino',
-		descripcion: 'Sigue tu viaje en tiempo real, tu familia también puede verlo',
-		icono: 'ubicacion',
+		titulo: '[Título del paso 3]',
+		descripcion: '[Descripción breve del paso 3]',
+		screenshot: 'paso-3.png',
+	},
+	{
+		titulo: '[Título del paso 4]',
+		descripcion: '[Descripción breve del paso 4]',
+		screenshot: 'paso-4.png',
+	},
+	{
+		titulo: '[Título del paso 5]',
+		descripcion: '[Descripción breve del paso 5]',
+		screenshot: 'paso-5.png',
 	},
 ];
 
@@ -68,172 +73,167 @@ export const CarruselEducativoZAS: React.FC<{slideIndex: number}> = ({slideIndex
 	const isLastSlide = slideIndex === SLIDES.length - 1;
 
 	return (
-		<AbsoluteFill style={{backgroundColor: COLORS.brandNavy}}>
-			<SlideBackground />
+		<AbsoluteFill style={{backgroundColor: COLORS.brandBlack}}>
+			<TopBar numero={numero} />
 
 			<div
 				style={{
 					position: 'absolute',
-					top: 70,
-					left: 70,
-					right: 70,
+					top: TOP_BAR_HEIGHT,
+					left: 0,
+					right: 0,
+					bottom: 0,
 					display: 'flex',
+					flexDirection: 'column',
 					alignItems: 'center',
-					justifyContent: 'space-between',
+					padding: '44px 70px 60px',
 				}}
 			>
-				<SlideLogo />
-				<SlideNumberBadge numero={numero} />
-			</div>
-
-			<AbsoluteFill
-				style={{
-					alignItems: 'center',
-					justifyContent: 'center',
-					padding: '0 90px',
-					paddingBottom: isLastSlide ? 300 : 0,
-				}}
-			>
-				{slide.icono ? (
-					<div
-						style={{
-							fontSize: 130,
-							marginBottom: 40,
-							filter: `drop-shadow(0 10px 20px ${COLORS.shadow})`,
-						}}
-					>
-						{ICONS[slide.icono]}
-					</div>
-				) : null}
 				<div
 					style={{
 						fontFamily: 'Arial, sans-serif',
 						fontWeight: 900,
-						fontSize: 82,
+						fontSize: 58,
 						lineHeight: 1.15,
 						color: COLORS.white,
 						textAlign: 'center',
-						textShadow: `0 8px 24px ${COLORS.shadow}`,
-						marginBottom: 30,
+						textShadow: `0 6px 18px ${COLORS.shadow}`,
 					}}
 				>
 					{slide.titulo}
 				</div>
 				<div
 					style={{
+						marginTop: 16,
 						fontFamily: 'Arial, sans-serif',
 						fontWeight: 600,
-						fontSize: 40,
+						fontSize: 32,
 						lineHeight: 1.4,
-						color: '#D7DAE6',
+						color: '#C7CBDA',
 						textAlign: 'center',
-						maxWidth: 820,
+						maxWidth: 780,
 					}}
 				>
 					{slide.descripcion}
 				</div>
-			</AbsoluteFill>
 
-			{isLastSlide ? <CtaFooter /> : null}
+				<PhoneMockup screenshot={slide.screenshot} />
+
+				{isLastSlide ? <CtaFooter /> : null}
+			</div>
 		</AbsoluteFill>
 	);
 };
 
 // ============================================================================
-// FONDO — mismo degradado de marca (verde/azul/amarillo) y viñeta que usan
-// FelizInicioSemanaZAS y UsaZasApp, en versión estática (sin animación de
-// frame, ya que este componente es una imagen fija).
+// BARRA SUPERIOR — degradado de marca ZAS (mismos tonos que el rayo del
+// logo), número de slide a la izquierda y logo ZAS a la derecha.
 // ============================================================================
 
-const SlideBackground: React.FC = () => (
-	<AbsoluteFill>
-		<AbsoluteFill
-			style={{
-				background: `radial-gradient(circle at 46% 26%, #3FDC8C4D 0%, transparent 45%),
-					radial-gradient(circle at 58% 72%, #3B8CE84D 0%, transparent 50%),
-					radial-gradient(circle at 50% 105%, #F7E24B26 0%, transparent 55%)`,
-			}}
-		/>
-		<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', opacity: 0.12}}>
-			<div style={{transform: 'scale(3.4) rotate(-3deg)'}}>
-				<BoltIcon size={260} />
-			</div>
-		</AbsoluteFill>
-		<AbsoluteFill
-			style={{
-				background: `radial-gradient(circle at 50% 45%, transparent 40%, ${COLORS.brandNavy}CC 100%)`,
-			}}
-		/>
-	</AbsoluteFill>
-);
+const TOP_BAR_HEIGHT = 130;
 
-// ============================================================================
-// LOGO — respeta LOGO_MODE/LOGO_SRC definidos en FelizInicioSemanaZAS.tsx:
-// coloca public/assets/zas-logo.png y cambia LOGO_MODE a 'image' ahí para
-// que el logo real se use en todas las composiciones, incluida esta.
-// ============================================================================
-
-const SlideLogo: React.FC = () => {
-	if ((LOGO_MODE as string) === 'image') {
-		return (
-			<Img
-				src={staticFile(LOGO_SRC)}
-				style={{
-					height: 48,
-					width: 'auto',
-					objectFit: 'contain',
-					filter: `drop-shadow(0 6px 14px ${COLORS.shadow})`,
-				}}
-			/>
-		);
-	}
-
-	return (
-		<div
+const TopBar: React.FC<{numero: string}> = ({numero}) => (
+	<div
+		style={{
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			height: TOP_BAR_HEIGHT,
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			padding: '0 50px',
+			background: 'linear-gradient(90deg, #F7E24B 0%, #3FDC8C 45%, #2FC6D8 75%, #3B8CE8 100%)',
+			boxShadow: `0 6px 20px ${COLORS.shadow}`,
+		}}
+	>
+		<span
 			style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: 10,
-				backgroundColor: 'rgba(10, 10, 10, 0.55)',
-				padding: '10px 22px',
-				borderRadius: 999,
-				boxShadow: `0 6px 16px ${COLORS.shadow}`,
+				fontFamily: 'Arial, sans-serif',
+				fontWeight: 900,
+				fontSize: 34,
+				color: COLORS.brandBlack,
 			}}
 		>
-			<BoltIcon size={30} />
+			{numero}
+		</span>
+		<div style={{display: 'flex', alignItems: 'center', gap: 10}}>
+			<BoltIcon size={32} />
 			<span
 				style={{
 					fontFamily: 'Arial, sans-serif',
 					fontWeight: 900,
-					fontSize: 26,
-					color: COLORS.brandYellow,
+					fontSize: 30,
+					color: COLORS.brandBlack,
 					letterSpacing: 2,
 				}}
 			>
 				ZAS
 			</span>
 		</div>
-	);
-};
+	</div>
+);
 
-const SlideNumberBadge: React.FC<{numero: string}> = ({numero}) => (
+// ============================================================================
+// MOCKUP DE TELÉFONO — envuelve la captura de pantalla del paso con un frame
+// oscuro, esquinas redondeadas y sombra. Ocupa el espacio central/inferior
+// disponible (se achica solo en la última slide para dejar lugar al CTA).
+// ============================================================================
+
+const PhoneMockup: React.FC<{screenshot: string}> = ({screenshot}) => (
 	<div
 		style={{
+			flex: 1,
+			minHeight: 0,
+			width: '100%',
+			marginTop: 36,
 			display: 'flex',
 			alignItems: 'center',
 			justifyContent: 'center',
-			minWidth: 64,
-			height: 64,
-			padding: '0 10px',
-			borderRadius: 999,
-			backgroundColor: 'rgba(10, 10, 10, 0.55)',
-			border: `2px solid ${COLORS.brandYellow}`,
-			boxShadow: `0 6px 16px ${COLORS.shadow}`,
 		}}
 	>
-		<span style={{fontFamily: 'Arial, sans-serif', fontWeight: 900, fontSize: 24, color: COLORS.white}}>
-			{numero}
-		</span>
+		<div
+			style={{
+				position: 'relative',
+				height: '100%',
+				aspectRatio: '9 / 19.5',
+				maxWidth: '100%',
+				borderRadius: 44,
+				padding: 14,
+				backgroundColor: '#111318',
+				border: '2px solid rgba(255,255,255,0.08)',
+				boxShadow: `0 24px 60px ${COLORS.shadow}`,
+			}}
+		>
+			<div
+				style={{
+					position: 'absolute',
+					top: 26,
+					left: '50%',
+					transform: 'translateX(-50%)',
+					width: 70,
+					height: 8,
+					borderRadius: 6,
+					backgroundColor: 'rgba(255,255,255,0.18)',
+					zIndex: 1,
+				}}
+			/>
+			<div
+				style={{
+					width: '100%',
+					height: '100%',
+					borderRadius: 30,
+					overflow: 'hidden',
+					backgroundColor: '#000',
+				}}
+			>
+				<Img
+					src={staticFile(`screenshots/${screenshot}`)}
+					style={{width: '100%', height: '100%', objectFit: 'cover'}}
+				/>
+			</div>
+		</div>
 	</div>
 );
 
@@ -244,21 +244,18 @@ const SlideNumberBadge: React.FC<{numero: string}> = ({numero}) => (
 const CtaFooter: React.FC = () => (
 	<div
 		style={{
-			position: 'absolute',
-			bottom: 80,
-			left: 0,
-			right: 0,
+			marginTop: 30,
 			display: 'flex',
 			flexDirection: 'column',
 			alignItems: 'center',
-			gap: 24,
+			gap: 18,
 		}}
 	>
 		<div
 			style={{
 				fontFamily: 'Arial, sans-serif',
 				fontWeight: 900,
-				fontSize: 40,
+				fontSize: 36,
 				color: COLORS.white,
 				textAlign: 'center',
 				textShadow: `0 6px 16px ${COLORS.shadow}`,
@@ -271,7 +268,7 @@ const CtaFooter: React.FC = () => (
 			style={{
 				fontFamily: 'Arial, sans-serif',
 				fontWeight: 700,
-				fontSize: 32,
+				fontSize: 28,
 				color: COLORS.white,
 				letterSpacing: 2,
 				textShadow: `0 4px 12px ${COLORS.shadow}`,
